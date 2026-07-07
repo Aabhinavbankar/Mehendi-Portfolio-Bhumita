@@ -77,7 +77,7 @@ export const testimonials: Testimonial[] = [
 
 export const about = {
   intro:
-    "I'm Bhumita Farkunde, a bridal and occasion mehendi artist based in Nagpur. For every bride I treat her mehendi as a keepsake of her day — unhurried, personal, and rich in detail.",
+    "I'm Bhumita Farkunde — Bali — a bridal and occasion mehendi artist based in Nagpur. For every bride I treat her mehendi as a keepsake of her day — unhurried, personal, and rich in detail.",
   body:
     "From intricate full-bridal sets to delicate minimal patterns, I work closely with each client to design something that feels like theirs. I travel across Nagpur and nearby towns for weddings and functions, and take a limited number of bookings each season so every design gets the time it deserves.",
   areas: "Nagpur · Wardha · Amravati · nearby towns for destination weddings",

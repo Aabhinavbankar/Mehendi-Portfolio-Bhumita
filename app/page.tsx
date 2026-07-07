@@ -56,15 +56,13 @@ export default function Home() {
 
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {featured.map((d) => (
-            <Link
-              key={d.id}
-              href="/portfolio"
-              className="group overflow-hidden rounded-2xl"
-            >
-              <DesignImage
-                seed={d.id}
-                className="aspect-[3/4] w-full transition-transform duration-500 group-hover:scale-105"
-              />
+            <Link key={d.id} href="/portfolio" className="group block">
+              <div className="overflow-hidden rounded-2xl">
+                <DesignImage
+                  seed={d.id}
+                  className="aspect-[3/4] w-full transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               <p className="mt-3 text-sm text-ink">
                 {d.caption}
                 <span className="ml-2 text-xs uppercase tracking-wide text-ink-soft">
@@ -85,7 +83,7 @@ export default function Home() {
             className="aspect-square w-full max-w-sm rounded-3xl shadow-lg"
           />
           <div>
-            <SectionHeading eyebrow="About" title="Meet Bhumita" />
+            <SectionHeading eyebrow="About" title="Meet Bali" />
             <p className="mt-6 text-lg leading-relaxed text-ink-soft">
               {about.intro}
             </p>

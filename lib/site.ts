@@ -4,14 +4,13 @@
 
 export const site = {
   name: "Bhumita Farkunde",
-  brand: "Bhumita Mehendi",
+  brand: "Mehendi by Bali",
   tagline: "Bridal & Occasion Mehendi Artist",
   location: "Nagpur, Maharashtra",
 
-  // Contact — replace with Bhumita's real details.
-  // WhatsApp must be in international format, digits only (91 = India).
-  whatsapp: "919999999999",
-  email: "bhumita.mehendi@example.com",
+  // Contact — WhatsApp must be in international format, digits only (91 = India).
+  whatsapp: "919764419671",
+  email: "bhumitaf17@gmail.com",
   instagram: "bhumita.mehendi",
 
   // Prefilled WhatsApp opener — gives Bhumita instant context on every lead.
