@@ -113,6 +113,29 @@ on conflict do nothing;
 -- Seed the current placeholder designs so the gallery stays populated until
 -- real photos are uploaded. These point at the bundled /public/designs SVGs;
 -- uploaded photos will store a full Supabase Storage URL instead.
+-- ─────────────────────────────────────────────────────────────
+-- Realtime: broadcast row changes to subscribed browsers (live updates
+-- without a page reload). Safe to re-run.
+-- ─────────────────────────────────────────────────────────────
+
+do $$
+declare t text;
+begin
+  foreach t in array array['designs','testimonials','services','site_content']
+  loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = t
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    end if;
+  end loop;
+end $$;
+
+-- ─────────────────────────────────────────────────────────────
+
 insert into public.designs (image_url, category, caption, is_featured, sort_order) values
   ('/designs/d01.svg', 'Bridal',  'Full bridal hands & feet',    true,  1),
   ('/designs/d02.svg', 'Bridal',  'Portrait bridal with names',  true,  2),

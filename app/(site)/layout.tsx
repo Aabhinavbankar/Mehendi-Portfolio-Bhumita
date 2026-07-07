@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import StickyWhatsApp from "@/components/StickyWhatsApp";
+import RealtimeRefresher from "@/components/RealtimeRefresher";
 import { getSiteContent } from "@/lib/content";
 
 // Layout for the public marketing site. The admin (/admin) is deliberately
@@ -15,6 +16,7 @@ export default async function SiteLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
+      <RealtimeRefresher />
       <Nav contact={contact} />
       <main className="flex-1">{children}</main>
       <Footer contact={contact} />
