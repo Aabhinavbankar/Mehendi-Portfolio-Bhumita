@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm henna & gold palette — committed single (light) theme, chosen for a
+     bridal subject rather than a neutral default. */
+  --color-cream: #fbf7f0;
+  --color-cream-deep: #f2e8d8;
+  --color-parchment: #f6efe3;
+  --color-henna: #7b2d26;
+  --color-henna-deep: #5e211c;
+  --color-gold: #b98a2e;
+  --color-gold-soft: #d9b25f;
+  --color-ink: #2a211c;
+  --color-ink-soft: #6b5d52;
+  --color-line: #e4d8c5;
+
+  --font-display: var(--ff-display), Georgia, "Times New Roman", serif;
+  --font-body: var(--ff-body), system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Thin gold rule used as a section accent */
+.rule-gold {
+  height: 2px;
+  width: 56px;
+  background: linear-gradient(90deg, var(--color-gold), var(--color-gold-soft));
+  border-radius: 2px;
+}

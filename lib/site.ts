@@ -1,0 +1,44 @@
+// Central site config. Once the Supabase admin is live, the contact fields
+// below are sourced from the `site_content` table instead — but these remain
+// the safe fallbacks.
+
+export const site = {
+  name: "Bhumita Farkunde",
+  brand: "Bhumita Mehendi",
+  tagline: "Bridal & Occasion Mehendi Artist",
+  location: "Nagpur, Maharashtra",
+
+  // Contact — replace with Bhumita's real details.
+  // WhatsApp must be in international format, digits only (91 = India).
+  whatsapp: "919999999999",
+  email: "bhumita.mehendi@example.com",
+  instagram: "bhumita.mehendi",
+
+  // Prefilled WhatsApp opener — gives Bhumita instant context on every lead.
+  whatsappGreeting:
+    "Hi Bhumita! I saw your portfolio and I'm interested in bridal mehendi. My event is on ",
+} as const;
+
+/** Builds a wa.me deep link with an optional prefilled message. */
+export function whatsappUrl(message: string = site.whatsappGreeting): string {
+  return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
+/** Builds a mailto: link with a preset subject. */
+export function emailUrl(
+  subject = "Bridal Mehendi enquiry",
+  body = "Hi Bhumita,\n\nI saw your portfolio and would like to enquire about mehendi for my event.\n\nEvent date:\nLocation:\n\nThank you!"
+): string {
+  return `mailto:${site.email}?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
+}
+
+export const instagramUrl = `https://instagram.com/${site.instagram}`;
+
+export const nav = [
+  { href: "/", label: "Home" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+] as const;
