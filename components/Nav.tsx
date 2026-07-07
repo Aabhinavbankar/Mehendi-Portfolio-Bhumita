@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { nav, site, whatsappUrl } from "@/lib/site";
+import { nav, site, whatsappUrl, defaultContact, type Contact } from "@/lib/site";
 
-export default function Nav() {
+export default function Nav({ contact = defaultContact }: { contact?: Contact }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export default function Nav() {
             );
           })}
           <a
-            href={whatsappUrl()}
+            href={whatsappUrl(contact)}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full bg-henna px-5 py-2 text-sm font-medium text-cream transition-colors hover:bg-henna-deep"
@@ -93,7 +93,7 @@ export default function Nav() {
             </Link>
           ))}
           <a
-            href={whatsappUrl()}
+            href={whatsappUrl(contact)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 block rounded-full bg-henna px-5 py-3 text-center text-base font-medium text-cream"

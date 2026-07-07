@@ -2,14 +2,9 @@
 
 import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
-import {
-  about as seedAbout,
-  designs as seedDesigns,
-  services as seedServices,
-  testimonials as seedTestimonials,
-} from "@/lib/data";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { site } from "@/lib/site";
-import type { AboutInfo, AdminDesign, ContactInfo, Service, Testimonial } from "@/components/admin/types";
 import DesignsPanel from "@/components/admin/DesignsPanel";
 import TestimonialsPanel from "@/components/admin/TestimonialsPanel";
 import ContentPanel from "@/components/admin/ContentPanel";
@@ -24,26 +19,15 @@ const TABS = [
 type TabKey = (typeof TABS)[number]["key"];
 
 export default function Dashboard() {
+  const router = useRouter();
   const [tab, setTab] = useState<TabKey>("designs");
 
-  // In-memory prototype state, seeded from the current site content.
-  const [designs, setDesigns] = useState<AdminDesign[]>(() =>
-    seedDesigns.map((d) => ({ ...d, seed: d.id }))
-  );
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(() =>
-    seedTestimonials.map((t) => ({ ...t }))
-  );
-  const [services, setServices] = useState<Service[]>(() =>
-    seedServices.map((s) => ({ ...s }))
-  );
-  const [about, setAbout] = useState<AboutInfo>(() => ({ ...seedAbout }));
-  const [contact, setContact] = useState<ContactInfo>(() => ({
-    whatsapp: site.whatsapp,
-    email: site.email,
-    instagram: site.instagram,
-    greeting: site.whatsappGreeting,
-    location: site.location,
-  }));
+  const logout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/admin");
+    router.refresh();
+  };
 
   // Toast
   const [toast, setToast] = useState<string | null>(null);
@@ -75,23 +59,16 @@ export default function Dashboard() {
             >
               View site ↗
             </Link>
-            <Link
-              href="/admin"
+            <button
+              type="button"
+              onClick={logout}
               className="rounded-full bg-henna px-3 py-1.5 text-xs font-medium text-cream transition-colors hover:bg-henna-deep"
             >
               Log out
-            </Link>
+            </button>
           </div>
         </div>
       </header>
-
-      {/* Preview banner */}
-      <div className="border-b border-gold-soft/40 bg-gold-soft/15">
-        <div className="mx-auto max-w-6xl px-5 py-2 text-center text-xs text-ink-soft md:px-8">
-          <strong className="font-semibold text-ink">Preview mode.</strong>{" "}
-          Changes are not saved yet — this connects to Supabase next.
-        </div>
-      </div>
 
       {/* Body: sidebar + panel */}
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-6 md:flex-row md:px-8 md:py-8">
@@ -116,28 +93,10 @@ export default function Dashboard() {
 
         {/* Active panel */}
         <main className="min-w-0 flex-1">
-          {tab === "designs" && (
-            <DesignsPanel designs={designs} setDesigns={setDesigns} notify={notify} />
-          )}
-          {tab === "testimonials" && (
-            <TestimonialsPanel
-              items={testimonials}
-              setItems={setTestimonials}
-              notify={notify}
-            />
-          )}
-          {tab === "content" && (
-            <ContentPanel
-              about={about}
-              setAbout={setAbout}
-              services={services}
-              setServices={setServices}
-              notify={notify}
-            />
-          )}
-          {tab === "contact" && (
-            <ContactPanel contact={contact} setContact={setContact} notify={notify} />
-          )}
+          {tab === "designs" && <DesignsPanel notify={notify} />}
+          {tab === "testimonials" && <TestimonialsPanel notify={notify} />}
+          {tab === "content" && <ContentPanel notify={notify} />}
+          {tab === "contact" && <ContactPanel notify={notify} />}
         </main>
       </div>
 

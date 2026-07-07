@@ -1,17 +1,25 @@
-import type { Design, Service, Testimonial } from "@/lib/data";
+import type { Category } from "@/lib/data";
 
-// In the admin prototype a design carries a `seed` for its placeholder image,
-// separate from its id (real photos replace this once Supabase Storage is wired).
-export type AdminDesign = Design & { seed?: string };
-
-export type AboutInfo = { intro: string; body: string; areas: string };
-
-export type ContactInfo = {
-  whatsapp: string;
-  email: string;
-  instagram: string;
-  greeting: string;
-  location: string;
+// Database row shapes (snake_case, as stored in Supabase).
+export type DesignRow = {
+  id: string;
+  image_url: string;
+  category: Category;
+  caption: string;
+  is_featured: boolean;
+  sort_order: number;
 };
 
-export type { Service, Testimonial };
+export type TestimonialRow = {
+  id: string;
+  bride_name: string;
+  quote: string;
+  sort_order: number;
+};
+
+export type ServiceRow = {
+  id: string;
+  title: string;
+  detail: string;
+  sort_order: number;
+};

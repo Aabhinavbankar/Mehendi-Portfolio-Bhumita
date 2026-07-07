@@ -1,7 +1,19 @@
 import Link from "next/link";
-import { emailUrl, instagramUrl, nav, site, whatsappUrl } from "@/lib/site";
+import {
+  emailUrl,
+  instagramUrl,
+  nav,
+  site,
+  whatsappUrl,
+  defaultContact,
+  type Contact,
+} from "@/lib/site";
 
-export default function Footer() {
+export default function Footer({
+  contact = defaultContact,
+}: {
+  contact?: Contact;
+}) {
   return (
     <footer className="mt-24 border-t border-line bg-parchment">
       <div className="mx-auto max-w-6xl px-5 py-14 md:px-8">
@@ -42,7 +54,7 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 <li>
                   <a
-                    href={whatsappUrl()}
+                    href={whatsappUrl(contact)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-ink transition-colors hover:text-henna"
@@ -52,7 +64,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href={emailUrl()}
+                    href={emailUrl(contact)}
                     className="text-ink transition-colors hover:text-henna"
                   >
                     Email
@@ -60,7 +72,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href={instagramUrl}
+                    href={instagramUrl(contact)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-ink transition-colors hover:text-henna"

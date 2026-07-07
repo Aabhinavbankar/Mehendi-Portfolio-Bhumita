@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import {
-  emailUrl,
-  instagramUrl,
-  site,
-  whatsappUrl,
-} from "@/lib/site";
+import { emailUrl, instagramUrl, site, whatsappUrl } from "@/lib/site";
+import { getSiteContent } from "@/lib/content";
 import SectionHeading from "@/components/SectionHeading";
 
 export const metadata: Metadata = {
@@ -12,34 +8,36 @@ export const metadata: Metadata = {
   description: `Book Bhumita Farkunde for bridal or occasion mehendi in ${site.location}. Reach her on WhatsApp, email, or Instagram.`,
 };
 
-const channels = [
-  {
-    label: "WhatsApp",
-    value: "Fastest way to reach me",
-    href: whatsappUrl(),
-    external: true,
-    primary: true,
-  },
-  {
-    label: "Email",
-    value: site.email,
-    href: emailUrl(),
-    external: false,
-    primary: false,
-  },
-  {
-    label: "Instagram",
-    value: `@${site.instagram}`,
-    href: instagramUrl,
-    external: true,
-    primary: false,
-  },
-];
+export default async function ContactPage() {
+  const { contact } = await getSiteContent();
 
-export default function ContactPage() {
+  const channels = [
+    {
+      label: "WhatsApp",
+      value: "Fastest way to reach me",
+      href: whatsappUrl(contact),
+      external: true,
+      primary: true,
+    },
+    {
+      label: "Email",
+      value: contact.email,
+      href: emailUrl(contact),
+      external: false,
+      primary: false,
+    },
+    {
+      label: "Instagram",
+      value: `@${contact.instagram}`,
+      href: instagramUrl(contact),
+      external: true,
+      primary: false,
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-4xl px-5 py-16 md:px-8 md:py-20">
-      <div className="max-w-xl text-center md:mx-0 md:text-left mx-auto">
+      <div className="mx-auto max-w-xl text-center md:mx-0 md:text-left">
         <SectionHeading eyebrow="Get in touch" title="Let's plan your mehendi" />
         <p className="mt-6 text-lg leading-relaxed text-ink-soft">
           Tell me your event date, the style you love, and how many people need
@@ -79,9 +77,9 @@ export default function ContactPage() {
           📍
         </span>
         <div>
-          <p className="font-medium text-ink">Based in {site.location}</p>
+          <p className="font-medium text-ink">Based in {contact.location}</p>
           <p className="text-sm text-ink-soft">
-            Available across Nagpur and nearby towns for weddings & functions.
+            Available across Nagpur and nearby towns for weddings &amp; functions.
           </p>
         </div>
       </div>

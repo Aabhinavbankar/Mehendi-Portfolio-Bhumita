@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CATEGORIES, type Category, type Design } from "@/lib/data";
+import { CATEGORIES, type Category } from "@/lib/data";
+import type { PublicDesign } from "@/lib/types";
 import DesignImage from "@/components/DesignImage";
 
 type Filter = "All" | Category;
 const filters: Filter[] = ["All", ...CATEGORIES];
 
-export default function Gallery({ designs }: { designs: Design[] }) {
+export default function Gallery({ designs }: { designs: PublicDesign[] }) {
   const [active, setActive] = useState<Filter>("All");
   const [index, setIndex] = useState<number | null>(null);
 
@@ -111,7 +112,7 @@ export default function Gallery({ designs }: { designs: Design[] }) {
             aria-label={`View ${d.caption}`}
           >
             <DesignImage
-              seed={d.id}
+              url={d.imageUrl}
               decorative
               className="h-full w-full transition-transform duration-500 group-hover:scale-105"
             />
@@ -184,7 +185,7 @@ export default function Gallery({ designs }: { designs: Design[] }) {
             onClick={(e) => e.stopPropagation()}
           >
             <DesignImage
-              seed={current.id}
+              url={current.imageUrl}
               alt={`${current.caption} — ${current.category} mehendi design by Bali`}
               className="aspect-square w-full rounded-2xl"
             />

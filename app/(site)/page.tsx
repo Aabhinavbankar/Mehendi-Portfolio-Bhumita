@@ -1,11 +1,16 @@
 import Link from "next/link";
-import { about, designs, testimonials } from "@/lib/data";
 import { site } from "@/lib/site";
+import { getDesigns, getSiteContent, getTestimonials } from "@/lib/content";
 import DesignImage from "@/components/DesignImage";
 import ContactButtons from "@/components/ContactButtons";
 import SectionHeading from "@/components/SectionHeading";
 
-export default function Home() {
+export default async function Home() {
+  const [designs, testimonials, { about, contact }] = await Promise.all([
+    getDesigns(),
+    getTestimonials(),
+    getSiteContent(),
+  ]);
   const featured = designs.filter((d) => d.featured).slice(0, 3);
 
   return (
@@ -24,7 +29,7 @@ export default function Home() {
               {site.tagline}. Intricate bridal, Arabic, and minimal designs —
               unhurried and personal to you.
             </p>
-            <ContactButtons className="mt-8" />
+            <ContactButtons contact={contact} className="mt-8" />
           </div>
 
           {/* Hero image */}
@@ -55,7 +60,7 @@ export default function Home() {
             <Link key={d.id} href="/portfolio" className="group block">
               <div className="overflow-hidden rounded-2xl">
                 <DesignImage
-                  seed={d.id}
+                  url={d.imageUrl}
                   decorative
                   className="aspect-[3/4] w-full transition-transform duration-500 group-hover:scale-105"
                 />
@@ -127,7 +132,7 @@ export default function Home() {
             Tell me your event date and I'll share availability and details.
           </p>
           <div className="mt-8 flex justify-center">
-            <ContactButtons className="[&_a:first-child]:bg-cream [&_a:first-child]:text-henna [&_a:first-child:hover]:bg-cream-deep [&_a:last-child]:border-cream [&_a:last-child]:text-cream [&_a:last-child:hover]:bg-cream [&_a:last-child:hover]:text-henna" />
+            <ContactButtons contact={contact} className="[&_a:first-child]:bg-cream [&_a:first-child]:text-henna [&_a:first-child:hover]:bg-cream-deep [&_a:last-child]:border-cream [&_a:last-child]:text-cream [&_a:last-child:hover]:bg-cream [&_a:last-child:hover]:text-henna" />
           </div>
         </div>
       </section>

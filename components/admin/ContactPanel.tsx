@@ -1,20 +1,69 @@
 "use client";
 
-import type { ContactInfo } from "./types";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { defaultContact, type Contact } from "@/lib/site";
 import { Field, PanelHeader, btnPrimary, inputCls } from "./fields";
 
 export default function ContactPanel({
-  contact,
-  setContact,
   notify,
 }: {
-  contact: ContactInfo;
-  setContact: (next: ContactInfo) => void;
   notify: (msg: string) => void;
 }) {
+  const [supabase] = useState(() => createClient());
+  const [contact, setContact] = useState<Contact>(defaultContact);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase.from("site_content").select("*");
+    const m = Object.fromEntries(
+      (data ?? []).map((r) => [r.key as string, r.value as string])
+    );
+    setContact({
+      whatsapp: m.whatsapp ?? defaultContact.whatsapp,
+      email: m.email ?? defaultContact.email,
+      instagram: m.instagram ?? defaultContact.instagram,
+      greeting: m.greeting ?? defaultContact.greeting,
+      location: m.location ?? defaultContact.location,
+    });
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function save() {
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("site_content").upsert(
+        [
+          { key: "whatsapp", value: contact.whatsapp },
+          { key: "email", value: contact.email },
+          { key: "instagram", value: contact.instagram },
+          { key: "greeting", value: contact.greeting },
+          { key: "location", value: contact.location },
+        ],
+        { onConflict: "key" }
+      );
+      if (error) throw error;
+      notify("Saved.");
+    } catch (e) {
+      notify(`Couldn't save — ${(e as Error).message ?? "try again."}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const waPreview = `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(
     contact.greeting
   )}`;
+
+  if (loading)
+    return <p className="py-12 text-center text-sm text-ink-soft">Loading…</p>;
 
   return (
     <div>
@@ -79,15 +128,15 @@ export default function ContactPanel({
           <div className="mt-6 flex justify-end">
             <button
               type="button"
-              onClick={() => notify("Saved in preview — connect Supabase to persist.")}
+              onClick={save}
+              disabled={saving}
               className={btnPrimary}
             >
-              Save changes
+              {saving ? "Saving…" : "Save changes"}
             </button>
           </div>
         </section>
 
-        {/* Live preview */}
         <section className="rounded-2xl border border-line bg-parchment p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">
             Live preview

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { about, services } from "@/lib/data";
+import { getServices, getSiteContent } from "@/lib/content";
 import DesignImage from "@/components/DesignImage";
 import ContactButtons from "@/components/ContactButtons";
 import SectionHeading from "@/components/SectionHeading";
@@ -10,7 +10,12 @@ export const metadata: Metadata = {
     "About Bhumita Farkunde, bridal mehendi artist in Nagpur, and the services she offers. Contact for pricing.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [{ about, contact }, services] = await Promise.all([
+    getSiteContent(),
+    getServices(),
+  ]);
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
       {/* About */}
@@ -61,7 +66,7 @@ export default function AboutPage() {
               Share your date, design, and number of guests for a quote.
             </p>
           </div>
-          <ContactButtons />
+          <ContactButtons contact={contact} />
         </div>
       </section>
     </div>

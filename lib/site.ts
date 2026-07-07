@@ -1,39 +1,53 @@
-// Central site config. Once the Supabase admin is live, the contact fields
-// below are sourced from the `site_content` table instead — but these remain
-// the safe fallbacks.
+// Brand identity (static). Contact details are editable in the admin and stored
+// in Supabase `site_content`; `defaultContact` is the fallback when the DB is
+// unavailable, and drives everything before content is loaded.
 
 export const site = {
   name: "Bhumita Farkunde",
   brand: "Mehendi by Bali",
   tagline: "Bridal & Occasion Mehendi Artist",
   location: "Nagpur, Maharashtra",
+} as const;
 
-  // Contact — WhatsApp must be in international format, digits only (91 = India).
+export type Contact = {
+  whatsapp: string;
+  email: string;
+  instagram: string;
+  greeting: string;
+  location: string;
+};
+
+export const defaultContact: Contact = {
+  // WhatsApp: international format, digits only (91 = India).
   whatsapp: "919764419671",
   email: "bhumitaf17@gmail.com",
   instagram: "bhumita.mehendi",
-
-  // Prefilled WhatsApp opener — gives Bali instant context on every lead.
-  whatsappGreeting:
+  greeting:
     "Hi Bali! I saw your portfolio and I'm interested in bridal mehendi. My event is on ",
-} as const;
+  location: "Nagpur, Maharashtra",
+};
 
-/** Builds a wa.me deep link with an optional prefilled message. */
-export function whatsappUrl(message: string = site.whatsappGreeting): string {
-  return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
+/** wa.me deep link with the prefilled greeting. */
+export function whatsappUrl(contact: Contact = defaultContact): string {
+  return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(
+    contact.greeting
+  )}`;
 }
 
-/** Builds a mailto: link with a preset subject. */
+/** mailto: link with a preset subject + body. */
 export function emailUrl(
+  contact: Contact = defaultContact,
   subject = "Bridal Mehendi enquiry",
   body = "Hi Bali,\n\nI saw your portfolio and would like to enquire about mehendi for my event.\n\nEvent date:\nLocation:\n\nThank you!"
 ): string {
-  return `mailto:${site.email}?subject=${encodeURIComponent(
+  return `mailto:${contact.email}?subject=${encodeURIComponent(
     subject
   )}&body=${encodeURIComponent(body)}`;
 }
 
-export const instagramUrl = `https://instagram.com/${site.instagram}`;
+export function instagramUrl(contact: Contact = defaultContact): string {
+  return `https://instagram.com/${contact.instagram}`;
+}
 
 export const nav = [
   { href: "/", label: "Home" },

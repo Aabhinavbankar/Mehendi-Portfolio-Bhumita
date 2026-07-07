@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { designs } from "@/lib/data";
+import { getDesigns } from "@/lib/content";
 import Gallery from "@/components/Gallery";
 
 export const metadata: Metadata = {
@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     "Browse bridal, Arabic, minimal, and festive mehendi designs by Bhumita Farkunde in Nagpur.",
 };
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const designs = await getDesigns();
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
       <header className="mb-10 max-w-2xl text-center md:mx-0 md:text-left mx-auto">

@@ -1,25 +1,29 @@
-// Renders a design image from /public/designs/<seed>.svg.
-// These are placeholder "dummy" mehendi designs — replace the files (or switch
-// to Supabase Storage <Image> URLs) in phase 2 with Bhumita's real photos.
+// Renders a design image. Pass `url` for a real photo (Supabase Storage public
+// URL or any path), or `seed` to use a bundled /public/designs/<seed>.svg
+// placeholder. `url` wins when both are given.
 //
 // Alt text:
-//   - `decorative` → alt="" (image is purely visual; something nearby names it)
-//   - `alt`        → explicit description (use for standalone/lightbox images)
+//   - `decorative` → alt="" (something nearby names it)
+//   - `alt`        → explicit description
 //   - otherwise    → derived from `label`, else a sensible default
 
 export default function DesignImage({
   seed,
+  url,
   label,
   alt,
   decorative = false,
   className = "",
 }: {
-  seed: string;
+  seed?: string;
+  url?: string;
   label?: string;
   alt?: string;
   decorative?: boolean;
   className?: string;
 }) {
+  const src = url ?? (seed ? `/designs/${seed}.svg` : "/designs/d01.svg");
+
   const altText = decorative
     ? ""
     : alt ?? (label ? `${label} mehendi design` : "Mehendi design by Bali");
@@ -30,7 +34,7 @@ export default function DesignImage({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`/designs/${seed}.svg`}
+        src={src}
         alt={altText}
         loading="lazy"
         className="h-full w-full object-cover"
