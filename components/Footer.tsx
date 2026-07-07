@@ -5,8 +5,8 @@ export default function Footer() {
   return (
     <footer className="mt-24 border-t border-line bg-parchment">
       <div className="mx-auto max-w-6xl px-5 py-14 md:px-8">
-        <div className="flex flex-col gap-10 md:flex-row md:justify-between">
-          <div className="max-w-sm">
+        <div className="flex flex-col gap-10 text-center md:flex-row md:justify-between md:text-left">
+          <div className="max-w-sm mx-auto md:mx-0">
             <p className="font-display text-2xl font-semibold text-henna">
               {site.brand}
             </p>
@@ -16,7 +16,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="flex gap-14">
+          <div className="flex justify-center gap-14 md:justify-start">
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-ink-soft">
                 Explore
@@ -73,7 +73,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-line pt-6 text-xs text-ink-soft">
+        <div className="mt-12 border-t border-line pt-6 text-center text-xs text-ink-soft md:text-left">
           © {site.name}, {site.location}. Handcrafted mehendi.
         </div>
       </div>

@@ -39,7 +39,7 @@ const channels = [
 export default function ContactPage() {
   return (
     <div className="mx-auto max-w-4xl px-5 py-16 md:px-8 md:py-20">
-      <div className="max-w-xl">
+      <div className="max-w-xl text-center md:mx-0 md:text-left mx-auto">
         <SectionHeading eyebrow="Get in touch" title="Let's plan your mehendi" />
         <p className="mt-6 text-lg leading-relaxed text-ink-soft">
           Tell me your event date, the style you love, and how many people need
@@ -55,7 +55,7 @@ export default function ContactPage() {
             href={c.href}
             target={c.external ? "_blank" : undefined}
             rel={c.external ? "noopener noreferrer" : undefined}
-            className={`flex flex-col gap-1 rounded-2xl border p-6 transition-colors ${
+            className={`flex flex-col gap-1 rounded-2xl border p-6 text-center transition-colors md:text-left ${
               c.primary
                 ? "border-henna bg-henna text-cream hover:bg-henna-deep"
                 : "border-line bg-cream text-ink hover:border-henna"
@@ -74,7 +74,7 @@ export default function ContactPage() {
       </div>
 
       {/* Location */}
-      <div className="mt-8 flex items-center gap-3 rounded-2xl border border-line bg-parchment px-6 py-5">
+      <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-line bg-parchment px-6 py-5 text-center sm:flex-row sm:text-left">
         <span className="text-2xl" aria-hidden="true">
           📍
         </span>

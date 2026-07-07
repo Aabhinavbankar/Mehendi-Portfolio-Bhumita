@@ -13,7 +13,7 @@ export default function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-parchment">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-24">
-          <div>
+          <div className="text-center md:text-left">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-gold-ink">
               {site.location}
             </p>
@@ -40,7 +40,7 @@ export default function Home() {
 
       {/* Featured work */}
       <section className="mx-auto max-w-6xl px-5 py-20 md:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left">
           <SectionHeading eyebrow="Selected work" title="Featured designs" />
           <Link
             href="/portfolio"
@@ -77,9 +77,9 @@ export default function Home() {
           <DesignImage
             seed="about-portrait"
             label="The artist"
-            className="aspect-square w-full max-w-sm rounded-3xl shadow-lg"
+            className="mx-auto aspect-square w-full max-w-sm rounded-3xl shadow-lg md:mx-0"
           />
-          <div>
+          <div className="text-center md:text-left">
             <SectionHeading eyebrow="About" title="Meet Bali" />
             <p className="mt-6 text-lg leading-relaxed text-ink-soft">
               {about.intro}
@@ -101,7 +101,7 @@ export default function Home() {
           {testimonials.map((t) => (
             <figure
               key={t.id}
-              className="flex flex-col rounded-2xl border border-line bg-cream p-7"
+              className="flex flex-col rounded-2xl border border-line bg-cream p-7 text-center md:text-left"
             >
               <span className="font-display text-4xl leading-none text-gold-soft">
                 “

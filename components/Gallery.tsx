@@ -82,7 +82,7 @@ export default function Gallery({ designs }: { designs: Design[] }) {
   return (
     <div>
       {/* Filter chips */}
-      <div className="mb-8 flex flex-wrap gap-2.5">
+      <div className="mb-8 flex flex-wrap justify-center gap-2.5 md:justify-start">
         {filters.map((f) => (
           <button
             key={f}

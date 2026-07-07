@@ -18,9 +18,9 @@ export default function AboutPage() {
         <DesignImage
           seed="about-main"
           label="Bhumita"
-          className="aspect-square w-full rounded-3xl shadow-lg"
+          className="mx-auto aspect-square w-full max-w-sm rounded-3xl shadow-lg md:mx-0 md:max-w-none"
         />
-        <div>
+        <div className="text-center md:text-left">
           <SectionHeading eyebrow="About" title="A little about me" />
           <p className="mt-6 text-lg leading-relaxed text-ink-soft">
             {about.intro}
@@ -40,7 +40,7 @@ export default function AboutPage() {
           {services.map((s) => (
             <div
               key={s.title}
-              className="rounded-2xl border border-line bg-cream p-7"
+              className="rounded-2xl border border-line bg-cream p-7 text-center md:text-left"
             >
               <h3 className="font-display text-xl font-semibold text-henna">
                 {s.title}
@@ -52,7 +52,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col items-start gap-4 rounded-2xl bg-parchment px-7 py-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl bg-parchment px-7 py-8 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
           <div>
             <p className="font-display text-xl font-semibold text-henna">
               Every event is priced individually.

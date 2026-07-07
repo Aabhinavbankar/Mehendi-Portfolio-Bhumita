@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function PortfolioPage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
-      <header className="mb-10 max-w-2xl">
+      <header className="mb-10 max-w-2xl text-center md:mx-0 md:text-left mx-auto">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gold-ink">
           Portfolio
         </p>
