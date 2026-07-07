@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Fraunces, Mulish } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import StickyWhatsApp from "@/components/StickyWhatsApp";
 
 const display = Fraunces({
   subsets: ["latin"],
@@ -49,12 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <body className="min-h-screen flex flex-col">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <StickyWhatsApp />
-      </body>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }
