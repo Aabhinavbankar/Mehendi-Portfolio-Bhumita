@@ -18,9 +18,6 @@ export default function Nav() {
           onClick={() => setOpen(false)}
         >
           {site.brand}
-          <span className="ml-2 hidden text-xs font-normal uppercase tracking-[0.2em] text-ink-soft sm:inline">
-            Nagpur
-          </span>
         </Link>
 
         {/* Desktop nav */}

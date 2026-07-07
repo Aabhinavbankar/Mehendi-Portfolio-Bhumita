@@ -27,17 +27,12 @@ export default function Home() {
             <ContactButtons className="mt-8" />
           </div>
 
-          {/* Hero image cluster */}
-          <div className="relative">
+          {/* Hero image */}
+          <div>
             <DesignImage
               seed="hero-main"
               label="Bridal"
               className="aspect-[4/5] w-full rounded-3xl shadow-xl shadow-henna/10"
-            />
-            <DesignImage
-              seed="hero-accent"
-              decorative
-              className="absolute -bottom-6 -left-6 hidden aspect-square w-32 rounded-2xl border-4 border-cream shadow-lg sm:block"
             />
           </div>
         </div>
