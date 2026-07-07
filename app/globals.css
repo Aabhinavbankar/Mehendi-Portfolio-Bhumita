@@ -10,6 +10,9 @@
   --color-henna-deep: #5e211c;
   --color-gold: #b98a2e;
   --color-gold-soft: #d9b25f;
+  /* Darker antique gold for TEXT only — ~5.6:1 on cream, passes WCAG AA.
+     Keep --color-gold / --color-gold-soft for decorative marks (rules, dots). */
+  --color-gold-ink: #7c5e14;
   --color-ink: #2a211c;
   --color-ink-soft: #6b5d52;
   --color-line: #e4d8c5;

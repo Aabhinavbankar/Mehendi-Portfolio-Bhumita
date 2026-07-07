@@ -63,7 +63,7 @@ export default function ContactPage() {
           >
             <span
               className={`text-xs font-semibold uppercase tracking-[0.15em] ${
-                c.primary ? "text-cream/70" : "text-gold"
+                c.primary ? "text-cream/70" : "text-gold-ink"
               }`}
             >
               {c.label}

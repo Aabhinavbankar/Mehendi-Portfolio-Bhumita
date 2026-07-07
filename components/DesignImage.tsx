@@ -1,16 +1,29 @@
 // Renders a design image from /public/designs/<seed>.svg.
 // These are placeholder "dummy" mehendi designs — replace the files (or switch
 // to Supabase Storage <Image> URLs) in phase 2 with Bhumita's real photos.
+//
+// Alt text:
+//   - `decorative` → alt="" (image is purely visual; something nearby names it)
+//   - `alt`        → explicit description (use for standalone/lightbox images)
+//   - otherwise    → derived from `label`, else a sensible default
 
 export default function DesignImage({
   seed,
   label,
+  alt,
+  decorative = false,
   className = "",
 }: {
   seed: string;
   label?: string;
+  alt?: string;
+  decorative?: boolean;
   className?: string;
 }) {
+  const altText = decorative
+    ? ""
+    : alt ?? (label ? `${label} mehendi design` : "Mehendi design by Bali");
+
   return (
     <div
       className={`relative flex items-center justify-center overflow-hidden bg-cream-deep ${className}`}
@@ -18,7 +31,7 @@ export default function DesignImage({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/designs/${seed}.svg`}
-        alt={label ? `${label} mehendi design` : "Mehendi design by Bhumita"}
+        alt={altText}
         loading="lazy"
         className="h-full w-full object-cover"
       />

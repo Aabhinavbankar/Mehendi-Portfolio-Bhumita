@@ -14,7 +14,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-parchment">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-24">
           <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-gold-ink">
               {site.location}
             </p>
             <h1 className="font-display text-4xl font-semibold leading-[1.1] text-henna text-balance md:text-6xl">
@@ -36,6 +36,7 @@ export default function Home() {
             />
             <DesignImage
               seed="hero-accent"
+              decorative
               className="absolute -bottom-6 -left-6 hidden aspect-square w-32 rounded-2xl border-4 border-cream shadow-lg sm:block"
             />
           </div>
@@ -60,6 +61,7 @@ export default function Home() {
               <div className="overflow-hidden rounded-2xl">
                 <DesignImage
                   seed={d.id}
+                  decorative
                   className="aspect-[3/4] w-full transition-transform duration-500 group-hover:scale-105"
                 />
               </div>

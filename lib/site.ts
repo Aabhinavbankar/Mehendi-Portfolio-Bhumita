@@ -13,9 +13,9 @@ export const site = {
   email: "bhumitaf17@gmail.com",
   instagram: "bhumita.mehendi",
 
-  // Prefilled WhatsApp opener — gives Bhumita instant context on every lead.
+  // Prefilled WhatsApp opener — gives Bali instant context on every lead.
   whatsappGreeting:
-    "Hi Bhumita! I saw your portfolio and I'm interested in bridal mehendi. My event is on ",
+    "Hi Bali! I saw your portfolio and I'm interested in bridal mehendi. My event is on ",
 } as const;
 
 /** Builds a wa.me deep link with an optional prefilled message. */
@@ -26,7 +26,7 @@ export function whatsappUrl(message: string = site.whatsappGreeting): string {
 /** Builds a mailto: link with a preset subject. */
 export function emailUrl(
   subject = "Bridal Mehendi enquiry",
-  body = "Hi Bhumita,\n\nI saw your portfolio and would like to enquire about mehendi for my event.\n\nEvent date:\nLocation:\n\nThank you!"
+  body = "Hi Bali,\n\nI saw your portfolio and would like to enquire about mehendi for my event.\n\nEvent date:\nLocation:\n\nThank you!"
 ): string {
   return `mailto:${site.email}?subject=${encodeURIComponent(
     subject

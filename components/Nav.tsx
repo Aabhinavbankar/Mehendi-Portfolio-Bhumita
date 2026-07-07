@@ -57,6 +57,7 @@ export default function Nav() {
           type="button"
           aria-label="Toggle menu"
           aria-expanded={open}
+          aria-controls="mobile-nav"
           onClick={() => setOpen((o) => !o)}
           className="flex flex-col gap-1.5 p-1 md:hidden"
         >
@@ -80,7 +81,10 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {open && (
-        <nav className="border-t border-line bg-cream px-5 pb-6 pt-2 md:hidden">
+        <nav
+          id="mobile-nav"
+          className="border-t border-line bg-cream px-5 pb-6 pt-2 md:hidden"
+        >
           {nav.map((item) => (
             <Link
               key={item.href}

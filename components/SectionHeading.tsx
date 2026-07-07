@@ -10,7 +10,7 @@ export default function SectionHeading({
   return (
     <div className={center ? "flex flex-col items-center text-center" : ""}>
       {eyebrow && (
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gold-ink">
           {eyebrow}
         </p>
       )}
