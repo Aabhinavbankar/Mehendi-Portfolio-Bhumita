@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-5 py-16">
+    <div className="flex min-h-screen items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="mb-8 text-center">
@@ -83,11 +83,13 @@ export default function AdminLoginPage() {
               />
             </label>
 
-            {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-                {error}
-              </p>
-            )}
+            {/* Reserved slot so showing the error doesn't resize the card. */}
+            <p
+              aria-live="polite"
+              className="min-h-[1.25rem] text-sm text-red-600"
+            >
+              {error}
+            </p>
 
             <button
               type="submit"
