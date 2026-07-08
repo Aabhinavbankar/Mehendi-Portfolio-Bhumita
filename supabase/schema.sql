@@ -84,6 +84,32 @@ create policy "designs owner write" on storage.objects
   using (bucket_id = 'designs') with check (bucket_id = 'designs');
 
 -- ─────────────────────────────────────────────────────────────
+-- Reorder helper: atomically renumber designs from an ordered id array.
+-- Assigning positional ordinality in a single UPDATE makes reordering
+-- transactional AND repairs any duplicate/tied sort_order values.
+-- ─────────────────────────────────────────────────────────────
+
+create or replace function public.reorder_designs(ids uuid[])
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.designs d
+  set sort_order = pos.ord
+  from (
+    select id, ordinality as ord
+    from unnest(ids) with ordinality as u(id, ordinality)
+  ) pos
+  where d.id = pos.id;
+end $$;
+
+-- Only the authenticated owner may reorder (security definer bypasses RLS).
+revoke all on function public.reorder_designs(uuid[]) from public, anon;
+grant execute on function public.reorder_designs(uuid[]) to authenticated;
+
+-- ─────────────────────────────────────────────────────────────
 -- Seed content (keeps the live site populated after switching to DB)
 -- ─────────────────────────────────────────────────────────────
 
@@ -95,20 +121,33 @@ insert into public.site_content (key, value) values
   ('email',       'bhumitaf17@gmail.com'),
   ('instagram',   'bhumita.mehendi'),
   ('greeting',    'Hi Bali! I saw your portfolio and I''m interested in bridal mehendi. My event is on '),
-  ('location',    'Nagpur, Maharashtra')
+  ('location',    'Nagpur, Maharashtra'),
+  -- Brand imagery, editable under Admin → About & Services → Photos.
+  -- Empty = fall back to the bundled placeholder SVGs.
+  ('hero_image',     ''),
+  ('portrait_image', '')
 on conflict (key) do nothing;
 
-insert into public.services (title, detail, sort_order) values
+-- NOTE: designs / testimonials / services have surrogate uuid PKs, so a bare
+-- `on conflict do nothing` would never fire on re-run and would duplicate every
+-- seed row. Each seed is instead guarded by `where not exists (... any row)`,
+-- so it only populates an empty table and is genuinely safe to re-run.
+
+insert into public.services (title, detail, sort_order)
+select * from (values
   ('Bridal Mehendi', 'Intricate full hands & feet for the bride, with names and personal motifs woven in.', 1),
   ('Engagement & Party', 'Elegant designs for engagements, sangeet, and family functions.', 2),
   ('Festive & Occasion', 'Karwa Chauth, Teej, Eid and celebration mehendi for groups at home.', 3)
-on conflict do nothing;
+) as v(title, detail, sort_order)
+where not exists (select 1 from public.services);
 
-insert into public.testimonials (bride_name, quote, sort_order) values
+insert into public.testimonials (bride_name, quote, sort_order)
+select * from (values
   ('Ananya, Nagpur', 'Bhumita made my bridal mehendi absolutely perfect. The detail on my hands had everyone at the wedding asking who my artist was!', 1),
   ('Sneha, Wardha', 'So patient and professional. She listened to exactly what I wanted and the colour came out beautifully dark.', 2),
   ('Rutuja, Nagpur', 'Booked her for my sangeet and the whole family loved their designs. Will definitely call her for every function.', 3)
-on conflict do nothing;
+) as v(bride_name, quote, sort_order)
+where not exists (select 1 from public.testimonials);
 
 -- Seed the current placeholder designs so the gallery stays populated until
 -- real photos are uploaded. These point at the bundled /public/designs SVGs;
@@ -136,7 +175,8 @@ end $$;
 
 -- ─────────────────────────────────────────────────────────────
 
-insert into public.designs (image_url, category, caption, is_featured, sort_order) values
+insert into public.designs (image_url, category, caption, is_featured, sort_order)
+select * from (values
   ('/designs/d01.svg', 'Bridal',  'Full bridal hands & feet',    true,  1),
   ('/designs/d02.svg', 'Bridal',  'Portrait bridal with names',  true,  2),
   ('/designs/d03.svg', 'Arabic',  'Bold Arabic trail',           true,  3),
@@ -149,4 +189,5 @@ insert into public.designs (image_url, category, caption, is_featured, sort_orde
   ('/designs/d10.svg', 'Bridal',  'Peacock motif bridal',        true,  10),
   ('/designs/d11.svg', 'Arabic',  'Rose & leaf Arabic',          false, 11),
   ('/designs/d12.svg', 'Minimal', 'Dainty back-hand pattern',    false, 12)
-on conflict do nothing;
+) as v(image_url, category, caption, is_featured, sort_order)
+where not exists (select 1 from public.designs);

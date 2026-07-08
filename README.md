@@ -3,9 +3,10 @@
 Public portfolio site for **Bhumita Farkunde**, bridal & occasion mehendi artist in Nagpur, MH.
 Built with **Next.js (App Router)** + **Tailwind CSS**, deployed on **Vercel**.
 
-> **Status: Phase 1 — public site.** All content is currently sample data in
-> `lib/data.ts`. The Supabase-backed admin (auth + upload) is phase 2; the code
-> is already structured so it drops in cleanly.
+> **Status: public site + Supabase admin, both live.** Content is served from
+> Supabase (designs, testimonials, services, about/contact, brand photos) and
+> managed at `/admin`. If Supabase is unreachable the site falls back to the
+> bundled sample data in `lib/data.ts`, so it never breaks.
 
 ## Run locally
 
@@ -25,34 +26,44 @@ app/
   portfolio/        gallery with filter + lightbox
   about/            about + services ("contact for pricing")
   contact/          WhatsApp / email / Instagram / location
-components/         Nav, Footer, Gallery, DesignImage (placeholder), etc.
+components/         Nav, Footer, Gallery, DesignImage, admin panels, etc.
 lib/
-  site.ts           brand + contact config, wa.me / mailto builders
-  data.ts           SAMPLE designs, services, testimonials, about copy
+  site.ts           brand config + wa.me / mailto builders + default fallbacks
+  content.ts        server-side reads from Supabase (with sample-data fallback)
+  storage.ts        image upload (client-side compression) + cleanup helpers
+  data.ts           SAMPLE content used only when Supabase is unreachable
+supabase/
+  schema.sql        tables, RLS, storage bucket, realtime, seed — safe to re-run
 ```
 
-## Before you deploy — edit these
+## First-time Supabase setup
 
-1. **`lib/site.ts`** — set the real `whatsapp` number (intl format, e.g.
-   `919876543210`), `email`, and `instagram` handle.
-2. **`lib/data.ts`** — sample designs/testimonials until the admin is live.
+1. Create a Supabase project.
+2. **SQL Editor → New query →** paste `supabase/schema.sql` → **Run** (idempotent,
+   safe to re-run).
+3. Copy `.env.local.example` → `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL`
+   and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API).
+4. **Authentication → Users → Add user** — create the single owner account. That
+   email/password logs into `/admin`.
 
-Image tiles are CSS-gradient placeholders (`components/DesignImage.tsx`) so the
-site looks complete before real photos exist. They're replaced by uploaded
-photos in phase 2.
+Everything (contact details, about copy, services, testimonials, designs, and the
+hero/portrait photos) is then editable in the admin — no code changes needed.
+Uploaded photos are downscaled in the browser before upload and served via
+`next/image`. Bundled `/public/designs/*.svg` placeholders show until real photos
+are added.
 
 ## Deploy to Vercel
 
 1. Push this repo to GitHub.
-2. In Vercel → **New Project** → import the repo → **Deploy** (no config needed).
+2. In Vercel → **New Project** → import the repo → add the two
+   `NEXT_PUBLIC_SUPABASE_*` env vars → **Deploy**.
 3. Add your custom domain (e.g. `bhumitamehendi.com`) in Project → Domains.
 
-## Phase 2 — Supabase admin (planned)
+## Data model (see `supabase/schema.sql`)
 
-- **Auth:** one owner account gates `/admin`.
-- **Postgres:** `designs`, `testimonials`, `site_content` tables.
-- **Storage:** `designs` bucket for photos (auto-optimized via Supabase image
-  transforms, rendered through `next/image`).
-- **RLS:** public `SELECT` only; authenticated owner does all writes.
-
-Copy `.env.local.example` → `.env.local` and fill in Supabase keys when we build it.
+- **Tables:** `designs`, `testimonials`, `services`, `site_content` (key/value for
+  about copy, contact info, and the `hero_image` / `portrait_image` URLs).
+- **Storage:** public `designs` bucket for uploaded photos.
+- **RLS:** anyone may `SELECT`; only the authenticated owner may write.
+- **Realtime:** content tables broadcast changes so the owner's open preview
+  updates live.

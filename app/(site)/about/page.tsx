@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const [{ about, contact }, services] = await Promise.all([
+  const [{ about, contact, images }, services] = await Promise.all([
     getSiteContent(),
     getServices(),
   ]);
@@ -21,8 +21,9 @@ export default async function AboutPage() {
       {/* About */}
       <section className="grid items-start gap-10 md:grid-cols-[1fr_1.3fr]">
         <DesignImage
+          url={images.portrait}
           seed="about-main"
-          label="Bhumita"
+          alt="Bhumita Farkunde — mehendi artist"
           className="mx-auto aspect-square w-full max-w-sm rounded-3xl shadow-lg md:mx-0 md:max-w-none"
         />
         <div className="text-center md:text-left">

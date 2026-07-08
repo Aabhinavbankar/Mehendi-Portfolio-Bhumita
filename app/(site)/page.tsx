@@ -6,12 +6,15 @@ import ContactButtons from "@/components/ContactButtons";
 import SectionHeading from "@/components/SectionHeading";
 
 export default async function Home() {
-  const [designs, testimonials, { about, contact }] = await Promise.all([
+  const [designs, testimonials, { about, contact, images }] = await Promise.all([
     getDesigns(),
     getTestimonials(),
     getSiteContent(),
   ]);
   const featured = designs.filter((d) => d.featured).slice(0, 3);
+  // The home page is a teaser — cap testimonials so a long list doesn't turn
+  // the landing page into an endless wall. The owner controls order in admin.
+  const featuredTestimonials = testimonials.slice(0, 6);
 
   return (
     <>
@@ -35,8 +38,10 @@ export default async function Home() {
           {/* Hero image */}
           <div>
             <DesignImage
+              url={images.hero}
               seed="hero-main"
-              label="Bridal"
+              alt="Intricate bridal mehendi by Bali"
+              priority
               className="aspect-[4/5] w-full rounded-3xl shadow-xl shadow-henna/10"
             />
           </div>
@@ -44,6 +49,7 @@ export default async function Home() {
       </section>
 
       {/* Featured work */}
+      {featured.length > 0 && (
       <section className="mx-auto max-w-6xl px-5 py-20 md:px-8">
         <div className="flex flex-col items-center gap-4 text-center md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left">
           <SectionHeading eyebrow="Selected work" title="Featured designs" />
@@ -75,13 +81,15 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      )}
 
       {/* About teaser */}
       <section className="bg-parchment">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 md:grid-cols-[1fr_1.2fr] md:px-8">
           <DesignImage
+            url={images.portrait}
             seed="about-portrait"
-            label="The artist"
+            alt="Bhumita Farkunde — mehendi artist"
             className="mx-auto aspect-square w-full max-w-sm rounded-3xl shadow-lg md:mx-0"
           />
           <div className="text-center md:text-left">
@@ -100,10 +108,11 @@ export default async function Home() {
       </section>
 
       {/* Testimonials */}
+      {featuredTestimonials.length > 0 && (
       <section className="mx-auto max-w-6xl px-5 py-20 md:px-8">
         <SectionHeading eyebrow="Kind words" title="What brides say" center />
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {testimonials.map((t) => (
+          {featuredTestimonials.map((t) => (
             <figure
               key={t.id}
               className="flex flex-col rounded-2xl border border-line bg-cream p-7 text-center md:text-left"
@@ -121,6 +130,7 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Final CTA */}
       <section className="bg-henna">

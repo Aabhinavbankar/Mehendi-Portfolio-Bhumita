@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import * as fallback from "@/lib/data";
-import { defaultContact, type Contact } from "@/lib/site";
+import { defaultContact, defaultImages, type Contact, type SiteImages } from "@/lib/site";
 import type {
   AboutContent,
   PublicDesign,
@@ -77,6 +77,7 @@ export async function getServices(): Promise<PublicService[]> {
 export async function getSiteContent(): Promise<{
   about: AboutContent;
   contact: Contact;
+  images: SiteImages;
 }> {
   try {
     const supabase = await createClient();
@@ -96,8 +97,17 @@ export async function getSiteContent(): Promise<{
         greeting: m.greeting ?? defaultContact.greeting,
         location: m.location ?? defaultContact.location,
       },
+      images: {
+        // Empty string in the DB means "not set" → keep the placeholder.
+        hero: m.hero_image || defaultImages.hero,
+        portrait: m.portrait_image || defaultImages.portrait,
+      },
     };
   } catch {
-    return { about: { ...fallback.about }, contact: { ...defaultContact } };
+    return {
+      about: { ...fallback.about },
+      contact: { ...defaultContact },
+      images: { ...defaultImages },
+    };
   }
 }

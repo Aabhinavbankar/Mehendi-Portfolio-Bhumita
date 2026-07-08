@@ -1,10 +1,23 @@
+// Uploaded design photos live in Supabase Storage; allow next/image to optimize
+// them by whitelisting the project's storage host (derived from the env URL so
+// there's nothing to hand-edit per environment). Placeholder SVGs are local and
+// rendered as plain <img>, so they don't need to be listed here.
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : undefined;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // When Supabase Storage is wired up (phase 2), design photos are served
-    // from your project's storage domain. Add it here so <Image> can optimize them:
-    // remotePatterns: [{ protocol: "https", hostname: "<project-ref>.supabase.co" }],
-    remotePatterns: [],
+    remotePatterns: supabaseHost
+      ? [
+          {
+            protocol: "https",
+            hostname: supabaseHost,
+            pathname: "/storage/v1/object/public/**",
+          },
+        ]
+      : [],
   },
 };
 

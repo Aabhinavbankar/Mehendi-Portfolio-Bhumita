@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import DesignImage from "@/components/DesignImage";
 import { CATEGORIES, type Category } from "@/lib/data";
 import { createClient } from "@/lib/supabase/client";
+import { uploadImage, removeImage } from "@/lib/storage";
+import Modal from "./Modal";
 import type { DesignRow } from "./types";
 import {
   Field,
@@ -86,16 +88,6 @@ export default function DesignsPanel({
     });
   };
 
-  async function uploadPhoto(file: File): Promise<string> {
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage
-      .from("designs")
-      .upload(path, file, { cacheControl: "3600", upsert: false });
-    if (error) throw error;
-    return supabase.storage.from("designs").getPublicUrl(path).data.publicUrl;
-  }
-
   async function save() {
     if (!draft) return;
     if (!draft.caption.trim()) return notify("Add a caption first.");
@@ -104,7 +96,7 @@ export default function DesignsPanel({
     setSaving(true);
     try {
       let imageUrl = draft.existingUrl;
-      if (draft.file) imageUrl = await uploadPhoto(draft.file);
+      if (draft.file) imageUrl = await uploadImage(supabase, draft.file);
 
       if (draft.id) {
         const { error } = await supabase
@@ -117,6 +109,10 @@ export default function DesignsPanel({
           })
           .eq("id", draft.id);
         if (error) throw error;
+        // A replaced photo leaves the old file orphaned — remove it.
+        if (draft.file && draft.existingUrl) {
+          await removeImage(supabase, draft.existingUrl);
+        }
         notify("Design updated.");
       } else {
         const nextSort =
@@ -142,8 +138,11 @@ export default function DesignsPanel({
 
   async function remove(id: string) {
     if (!window.confirm("Delete this design?")) return;
+    const target = items.find((d) => d.id === id);
     const { error } = await supabase.from("designs").delete().eq("id", id);
     if (error) return notify("Couldn't delete.");
+    // Drop the now-unreferenced photo from storage (no-op for placeholders).
+    if (target) await removeImage(supabase, target.image_url);
     setItems((prev) => prev.filter((d) => d.id !== id));
     notify("Design deleted.");
   }
@@ -163,14 +162,21 @@ export default function DesignsPanel({
     const i = items.findIndex((d) => d.id === id);
     const j = i + dir;
     if (i < 0 || j < 0 || j >= items.length) return;
-    const a = items[i];
-    const b = items[j];
-    const [e1, e2] = await Promise.all([
-      supabase.from("designs").update({ sort_order: b.sort_order }).eq("id", a.id),
-      supabase.from("designs").update({ sort_order: a.sort_order }).eq("id", b.id),
-    ]);
-    if (e1.error || e2.error) return notify("Couldn't reorder.");
-    await load();
+
+    // Reorder locally and renumber positions so the UI updates instantly.
+    const next = [...items];
+    [next[i], next[j]] = [next[j], next[i]];
+    const normalized = next.map((d, idx) => ({ ...d, sort_order: idx + 1 }));
+    setItems(normalized);
+
+    // Persist the whole order atomically (one UPDATE; also heals tied values).
+    const { error } = await supabase.rpc("reorder_designs", {
+      ids: normalized.map((d) => d.id),
+    });
+    if (error) {
+      notify("Couldn't reorder.");
+      await load(); // roll back to the server's truth
+    }
   }
 
   return (
@@ -295,19 +301,12 @@ export default function DesignsPanel({
 
       {/* Add / Edit modal */}
       {draft && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
-          onClick={() => !saving && setDraft(null)}
+        <Modal
+          title={draft.id ? "Edit design" : "Add design"}
+          onClose={() => setDraft(null)}
+          busy={saving}
         >
-          <div
-            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-cream p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-display text-xl font-semibold text-henna">
-              {draft.id ? "Edit design" : "Add design"}
-            </h3>
-
-            <div className="mt-5 flex flex-col gap-4">
+          <div className="mt-5 flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 {draft.previewUrl || draft.existingUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -395,8 +394,7 @@ export default function DesignsPanel({
                 {saving ? "Saving…" : draft.id ? "Save changes" : "Add design"}
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

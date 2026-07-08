@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Modal from "./Modal";
 import type { TestimonialRow } from "./types";
 import { Field, PanelHeader, btnGhost, btnPrimary, inputCls } from "./fields";
 
@@ -138,18 +139,12 @@ export default function TestimonialsPanel({
       )}
 
       {draft && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
-          onClick={() => !saving && setDraft(null)}
+        <Modal
+          title={draft.id ? "Edit testimonial" : "Add testimonial"}
+          onClose={() => setDraft(null)}
+          busy={saving}
         >
-          <div
-            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-cream p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-display text-xl font-semibold text-henna">
-              {draft.id ? "Edit testimonial" : "Add testimonial"}
-            </h3>
-            <div className="mt-5 flex flex-col gap-4">
+          <div className="mt-5 flex flex-col gap-4">
               <Field label="Bride's name & city">
                 <input
                   value={draft.brideName}
@@ -188,8 +183,7 @@ export default function TestimonialsPanel({
                 {saving ? "Saving…" : draft.id ? "Save changes" : "Add testimonial"}
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

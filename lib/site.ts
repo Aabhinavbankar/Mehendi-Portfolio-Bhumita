@@ -27,6 +27,16 @@ export const defaultContact: Contact = {
   location: "Nagpur, Maharashtra",
 };
 
+// Brand imagery editable in the admin (stored in `site_content` as the keys
+// `hero_image` / `portrait_image`). Defaults are the bundled placeholder SVGs,
+// so the site looks complete before the owner uploads real photos.
+export type SiteImages = { hero: string; portrait: string };
+
+export const defaultImages: SiteImages = {
+  hero: "/designs/hero-main.svg",
+  portrait: "/designs/about-main.svg",
+};
+
 /** wa.me deep link with the prefilled greeting. */
 export function whatsappUrl(contact: Contact = defaultContact): string {
   return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(

@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { about as fallbackAbout } from "@/lib/data";
+import { defaultImages } from "@/lib/site";
+import { uploadImage, removeImage } from "@/lib/storage";
 import { Field, PanelHeader, btnGhost, btnPrimary, inputCls } from "./fields";
 
 type About = { intro: string; body: string; areas: string };
 type ServiceItem = { id: string | null; title: string; detail: string };
+// A brand image being edited: `existing` is what's live, `file`/`preview` the
+// pending replacement (null until the owner picks one).
+type ImgDraft = { existing: string; file: File | null; preview: string | null };
+const emptyImg: ImgDraft = { existing: "", file: null, preview: null };
 
 export default function ContentPanel({
   notify,
@@ -15,6 +21,8 @@ export default function ContentPanel({
 }) {
   const [supabase] = useState(() => createClient());
   const [about, setAbout] = useState<About>({ intro: "", body: "", areas: "" });
+  const [hero, setHero] = useState<ImgDraft>(emptyImg);
+  const [portrait, setPortrait] = useState<ImgDraft>(emptyImg);
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [deleted, setDeleted] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +42,8 @@ export default function ContentPanel({
       body: m.about_body ?? fallbackAbout.body,
       areas: m.about_areas ?? fallbackAbout.areas,
     });
+    setHero({ existing: m.hero_image ?? "", file: null, preview: null });
+    setPortrait({ existing: m.portrait_image ?? "", file: null, preview: null });
     setServices(
       (svc.data ?? []).map((s) => ({
         id: s.id as string,
@@ -63,18 +73,43 @@ export default function ContentPanel({
       return prev.filter((_, idx) => idx !== i);
     });
 
+  const pickImage = (
+    cur: ImgDraft,
+    set: (v: ImgDraft) => void,
+    file: File | null
+  ) => {
+    if (cur.preview) URL.revokeObjectURL(cur.preview);
+    set({ ...cur, file, preview: file ? URL.createObjectURL(file) : null });
+  };
+
   async function save() {
     setSaving(true);
     try {
+      // Upload any newly-picked photos first so their URLs go into the same
+      // content upsert. Remember the old URLs to clean up afterwards.
+      const oldHero = hero.existing;
+      const oldPortrait = portrait.existing;
+      let heroUrl = hero.existing;
+      let portraitUrl = portrait.existing;
+      if (hero.file) heroUrl = await uploadImage(supabase, hero.file);
+      if (portrait.file) portraitUrl = await uploadImage(supabase, portrait.file);
+
       const { error: aErr } = await supabase.from("site_content").upsert(
         [
           { key: "about_intro", value: about.intro },
           { key: "about_body", value: about.body },
           { key: "about_areas", value: about.areas },
+          { key: "hero_image", value: heroUrl },
+          { key: "portrait_image", value: portraitUrl },
         ],
         { onConflict: "key" }
       );
       if (aErr) throw aErr;
+
+      // Replaced photos are now unreferenced — drop the old storage objects
+      // (no-ops for the bundled placeholders). Best-effort; never blocks save.
+      if (hero.file) await removeImage(supabase, oldHero);
+      if (portrait.file) await removeImage(supabase, oldPortrait);
 
       if (deleted.length) {
         const { error } = await supabase.from("services").delete().in("id", deleted);
@@ -139,6 +174,30 @@ export default function ContentPanel({
       </section>
 
       <section className="mt-6 rounded-2xl border border-line bg-cream p-5">
+        <h3 className="font-display text-lg font-semibold text-ink">Photos</h3>
+        <p className="mt-1 text-sm text-ink-soft">
+          The hero image on your home page and your portrait on the About page.
+          Leave a slot untouched to keep the current photo.
+        </p>
+        <div className="mt-4 grid gap-5 sm:grid-cols-2">
+          <PhotoField
+            label="Home hero"
+            hint="Large image beside the headline — a striking bridal shot works best."
+            img={hero}
+            fallback={defaultImages.hero}
+            onPick={(f) => pickImage(hero, setHero, f)}
+          />
+          <PhotoField
+            label="Portrait"
+            hint="Shown on the home teaser and the About page."
+            img={portrait}
+            fallback={defaultImages.portrait}
+            onPick={(f) => pickImage(portrait, setPortrait, f)}
+          />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-line bg-cream p-5">
         <div className="flex items-center justify-between">
           <h3 className="font-display text-lg font-semibold text-ink">Services</h3>
           <button type="button" onClick={addService} className={btnGhost}>
@@ -191,6 +250,56 @@ export default function ContentPanel({
           {saving ? "Saving…" : "Save changes"}
         </button>
       </div>
+    </div>
+  );
+}
+
+// One brand-image slot: preview + file picker + status line. Shows the live
+// placeholder until the owner uploads their own photo.
+function PhotoField({
+  label,
+  hint,
+  img,
+  fallback,
+  onPick,
+}: {
+  label: string;
+  hint: string;
+  img: ImgDraft;
+  fallback: string;
+  onPick: (file: File | null) => void;
+}) {
+  const src = img.preview || img.existing || fallback;
+  const usingPlaceholder = !img.preview && !img.existing;
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+        {label}
+      </span>
+      <div className="flex items-center gap-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          className="aspect-square w-20 shrink-0 rounded-xl border border-line object-cover"
+        />
+        <div className="min-w-0 flex-1">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+            className="w-full rounded-lg border border-line bg-parchment px-3 py-2 text-xs text-ink-soft file:mr-2 file:rounded file:border-0 file:bg-henna file:px-2 file:py-1 file:text-cream"
+          />
+          <span className="mt-1 block text-xs text-ink-soft/80">
+            {img.preview
+              ? "New photo selected — Save to apply."
+              : usingPlaceholder
+                ? "Using placeholder. Upload to set your own."
+                : "Current photo. Choose a file to replace."}
+          </span>
+        </div>
+      </div>
+      <span className="text-xs text-ink-soft/80">{hint}</span>
     </div>
   );
 }
